@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<!-- Metadata file for AutoRescan plugin -->
+<!-- Copyright © Stuart Hickinbottom 2007 -->
+
+<!-- This file is part of AutoRescan -->
+
+<!-- AutoRescan is free software; you can redistribute it and/or modify -->
+<!-- it under the terms of the GNU General Public License as published by -->
+<!-- the Free Software Foundation; either version 2 of the License, or -->
+<!-- (at your option) any later version. -->
+
+<!-- AutoRescan is distributed in the hope that it will be useful, -->
+<!-- but WITHOUT ANY WARRANTY; without even the implied warranty of -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the -->
+<!-- GNU General Public License for more details. -->
+
+<!-- You should have received a copy of the GNU General Public License -->
+<!-- along with AutoRescan if not, write to the Free Software -->
+<!-- Foundation, Inc., 51 Franklin St, Fifth Floor, -->
+<!-- Boston, MA  02110-1301  USA -->
+
+<!-- $Id$ -->
+
+<extension>
+	<id>ef4fd3fe-0597-423e-99fe-262c3262ea80</id>
+	<name>PLUGIN_AUTORESCAN</name>
+	<module>Plugins::AutoRescan::Plugin</module>
+	<version>@@VERSION@@</version>
+	<description>PLUGIN_AUTORESCAN_DESC</description>
+	<creator>Stuart Hickinbottom</creator>
+	<email>stuart@hickinbottom.com</email>
+
+	<defaultState>enabled</defaultState>
+        
+	<homepageURL>http://www.hickinbottom.com</homepageURL>
+	<optionsURL>plugins/AutoRescan/settings/basic.html</optionsURL>
+	<type>2</type>
+
+	<targetApplication>
+		<id>SqueezeCentre</id>
+		<minVersion>7.0a</minVersion>
+		<maxVersion>7.0+</maxVersion>
+	</targetApplication>
+</extension>

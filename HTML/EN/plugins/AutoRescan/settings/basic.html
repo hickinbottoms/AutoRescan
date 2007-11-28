@@ -1,0 +1,42 @@
+[%# Plugin settings template page for AutoRescan plugin for SqueezeCentre.
+  # Copyright © Stuart Hickinbottom 2007
+
+  # This file is part of AutoRescan.
+  #
+  # AutoRescan is free software; you can redistribute it and/or modify
+  # it under the terms of the GNU General Public License as published by
+  # the Free Software Foundation; either version 2 of the License, or
+  # (at your option) any later version.
+  #
+  # AutoRescan is distributed in the hope that it will be useful,
+  # but WITHOUT ANY WARRANTY; without even the implied warranty of
+  # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  # GNU General Public License for more details.
+  #
+  # You should have received a copy of the GNU General Public License
+  # along with AutoRescan; if not, write to the Free Software
+  # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+%]
+
+[% PROCESS settings/header.html %]
+
+	<div class="settingSection">
+		<div class="prefHead">[% "SETUP_PLUGIN_AUTORESCAN_DELAY_HEAD" | string | upper %]</div>
+		<div class="prefDesc">[% "SETUP_PLUGIN_AUTORESCAN_DELAY_DESC" | string %]</div>
+
+		<div class="prefDesc">
+			<table>
+				<tr>
+					<td>
+						<label for="delay">[% "SETUP_PLUGIN_AUTORESCAN_DELAY_CHOOSE" | string %]&nbsp;</label>
+					</td>
+					<td>
+						<input type="text" class="stdedit" name="delay" value="[% prefs.delay %]" size="1">
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+[% PROCESS settings/footer.html %]
+

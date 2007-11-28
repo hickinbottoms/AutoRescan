@@ -1,0 +1,46 @@
+# String file for AutoRescan plugin
+# Copyright © Stuart Hickinbottom 2007
+
+# This file is part of AutoRescan.
+#
+# AutoRescan is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# AutoRescan is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with AutoRescan; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+# $Id$
+
+PLUGIN_AUTORESCAN
+	EN	AutoRescan
+
+PLUGIN_AUTORESCAN_DESC
+	EN	Automatically rescan music files that have been changed.
+
+SETUP_PLUGIN_AUTORESCAN_GROUP_AUTORESCAN
+	EN	AutoRescan
+
+SETUP_PLUGIN_AUTORESCAN_GROUP_AUTORESCAN_DESC
+	EN	The settings below control how the automatic rescan of music performs.
+
+SETUP_PLUGIN_AUTORESCAN_DELAY_HEAD
+	EN	Delays and timings
+
+SETUP_PLUGIN_AUTORESCAN_DELAY_DESC
+	EN	This setting controls the amount of time after a change is detected that a rescan of the modified folders will be performed. This can be used to prevent multiple rescans from being performed when multiple changes are occurring (such as when multiple files are being copied).
+
+SETUP_PLUGIN_AUTORESCAN_DELAY_CHOOSE
+	EN	Rescan delay (seconds):
+
+# Local Variables:
+# tab-width:4
+# indent-tabs-mode:t
+# End:
