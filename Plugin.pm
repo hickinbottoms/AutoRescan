@@ -228,7 +228,7 @@ sub inotifyPoller() {
 		my $triggerTime = Time::HiRes::time() - $myPrefs->get('delay');
 		for my $dir (keys %touchedDirs) {
 			if ($touchedDirs{$dir} < $triggerTime) {
-				$log->debug("Triggering RESCAN of folder: $dir");
+				$log->info("Triggering RESCAN of folder: $dir");
 
 				# Rescan the changed directory.
 				my $dirURL = Slim::Utils::Misc::fileURLFromPath($dir);
@@ -242,11 +242,12 @@ sub inotifyPoller() {
 				# This bodge is necessary to fool the scan function into
 				# looking into this directory even though its modification time
 				# may not have changed from that in the database. This can
-				# happen if inidividual files are touch (eg though editing
+				# happen if individual files are touched (eg though editing
 				# their tags), which won't normally have the effect of touching
 				# the directory.
 				$dirObject->set_column('timestamp', $dirObject+1);
 
+				# Now ask for the directory to be rescanned.
 				Slim::Utils::Misc::findAndScanDirectoryTree( { obj => $dirObject } );
 				
 				delete $touchedDirs{$dir};
