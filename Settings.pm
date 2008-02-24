@@ -1,5 +1,5 @@
 # Web settings page handler for AutoRescan plugin for SqueezeCentre.
-# Copyright © Stuart Hickinbottom 2007
+# Copyright © Stuart Hickinbottom 2007-2008
 
 # This file is part of AutoRescan
 #
@@ -39,6 +39,12 @@ my $log = Slim::Utils::Log->addLogCategory(
 
 # Access to preferences for this plugin.
 my $myPrefs = preferences('plugin.autorescan');
+
+sub new {
+	my $class = shift;
+
+	$class->SUPER::new;
+}
 
 sub name {
 	return 'PLUGIN_AUTORESCAN';

@@ -1,5 +1,5 @@
 # AutoRescan Plugin for SqueezeCentre
-# Copyright © Stuart Hickinbottom 2004-2007
+# Copyright © Stuart Hickinbottom 2007-2008
 
 # This file is part of AutoRescan.
 #
@@ -19,10 +19,10 @@
 
 # $Id$
 
-# This is a plugin to automatic rescanning of music files as they are changed
-# within the filesystem. It depends on the 'inotify' kernel function within
-# Linux and, therefore, currently only works when used on a Linux system where
-# that kernel feature has been enabled. See the INSTALL file for further
+# This is a plugin to provide automatic rescanning of music files as they are
+# changed within the filesystem. It depends on the 'inotify' kernel function
+# within Linux and, therefore, currently only works when used on a Linux system
+# where that kernel feature has been enabled. See the INSTALL file for further
 # instructions on the kernel configuration.
 #
 # For further details see:
@@ -108,7 +108,7 @@ sub initPlugin() {
 	$class->SUPER::initPlugin(@_);
 
 	# Initialise settings.
-	Plugins::AutoRescan::Settings->new;
+	Plugins::AutoRescan::Settings->new($class);
 
 	# Remember we're now initialised. This prevents multiple-initialisation,
 	# which may otherwise cause trouble with duplicate hooks or modes.
@@ -204,8 +204,8 @@ sub addNotifier($) {
 	if (not exists $monitors{$dir}) {
 		$log->debug("Adding directory monitor for: $dir");
 
-		# Remember the monitor object created - we do this so we can check if it's
-		# already being monitored later on.
+		# Remember the monitor object created - we do this so we can check if
+		# it's already being monitored later on.
 		$monitors{$dir} = $inotify->watch($dir, IN_MODIFY | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE | IN_ONLYDIR | IN_DELETE_SELF, \&watchCallback);
 	} else {
 		$log->debug("Not adding monitor, one is already present for: $dir");
@@ -265,31 +265,47 @@ sub watchCallback() {
 
 	my $filename = $e->fullname;
 	my $is_directory = $e->IN_ISDIR;
-	my $dir_name; $dir_name = dirname($filename) if not $is_directory;
 	my $was_created = $e->IN_CREATE;
 	my $was_modified = $e->IN_MODIFY;
 	my $was_deleted = $e->IN_DELETE;
-	$log->debug("Received inotify event for: $filename");
+	my $was_moved_to = $e->IN_MOVED_TO;
+	my $was_moved_from = $e->IN_MOVED_FROM;
+	my $dir_name = dirname($filename);
+	$log->debug("Received inotify event for: $filename (is_directory=$is_directory, was_created=$was_created, was_modified=$was_modified, was_deleted=$was_deleted, was_moved_from=$was_moved_from, was_moved_to=$was_moved_to");
 
-	# If the event is a create, and it's a directory, we need to add a monitor
-	# for it.
 	if ($was_created && $is_directory) {
-		$log->debug("New directory created: $filename");
+		$log->info("New directory created: $filename");
 		addNotifierRecursive($filename);
 
 		noteTouch($filename);
 		
 	} elsif ($was_created && not $is_directory) {
-		$log->debug("Directory detected as modified by file creation: $dir_name");
+		$log->info("Directory detected as modified by file creation: $dir_name");
 
 		noteTouch($dir_name);
 
 	} elsif ($was_modified && not $is_directory) {
-		$log->debug("Directory detected as modified by file modification: $dir_name");
+		$log->info("Directory detected as modified by file modification: $dir_name");
 
 		noteTouch($dir_name);
 	} elsif ($was_deleted && not $is_directory) {
-		$log->debug("Directory detected as modified by file deletion: $dir_name");
+		$log->info("Directory detected as modified by file deletion: $dir_name");
+
+		noteTouch($dir_name);
+	} elsif ($was_moved_to && $is_directory) {
+		$log->info("Directory detected as moved in: $filename");
+
+		noteTouch($filename);
+	} elsif ($was_moved_to && not $is_directory) {
+		$log->info("Directory detected as modified by move in: $dir_name");
+
+		noteTouch($dir_name);
+	} elsif ($was_moved_from && $is_directory && -d $filename) {
+		$log->info("Directory detected as modified out: $filename");
+
+		noteTouch($filename);
+	} elsif ($was_moved_from && not $is_directory) {
+		$log->info("Directory detected as modified by move out: $dir_name");
 
 		noteTouch($dir_name);
 	}
