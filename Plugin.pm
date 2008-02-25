@@ -200,13 +200,14 @@ sub addNotifierRecursive($) {
 sub addNotifier($) {
 	my $dir = shift;
 
-	# Only add a monitor if we're not already monitoring this directory.
-	if (not exists $monitors{$dir}) {
+	# Only add a monitor if we're not already monitoring this directory (and
+	# it is indeed a directory).
+	if (not exists $monitors{$dir} && -d $dir) {
 		$log->debug("Adding directory monitor for: $dir");
 
 		# Remember the monitor object created - we do this so we can check if
 		# it's already being monitored later on.
-		$monitors{$dir} = $inotify->watch($dir, IN_MODIFY | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE | IN_ONLYDIR | IN_DELETE_SELF, \&watchCallback);
+		$monitors{$dir} = $inotify->watch($dir, IN_MODIFY | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE | IN_DELETE_SELF, \&watchCallback);
 	} else {
 		$log->debug("Not adding monitor, one is already present for: $dir");
 	}
