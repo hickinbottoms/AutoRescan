@@ -19,7 +19,7 @@
 
 # $Id$
 
-VERSION=1.0b3
+VERSION=1.0b4
 PERLSOURCE=Plugin.pm Settings.pm
 HTMLSOURCE=HTML/EN/plugins/AutoRescan/settings/basic.html
 SOURCE=$(PERLSOURCE) $(HTMLSOURCE) INSTALL strings.txt install.xml LICENSE

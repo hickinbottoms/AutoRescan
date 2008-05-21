@@ -219,6 +219,9 @@ sub inotifyPoller() {
 	# Pump that poller.
 	$inotify->poll;
 
+	# Flag of whether any rescanning was performed.
+	my $scan_done = 0;
+
 	# We don't perform any rescanning if a scan is currently underway - we
 	# defer it until it's finished.
 	if (not Slim::Music::Import->stillScanning()) {
@@ -230,6 +233,7 @@ sub inotifyPoller() {
 		for my $dir (keys %touchedDirs) {
 			if ($touchedDirs{$dir} < $triggerTime) {
 				$log->info("Triggering RESCAN of folder: $dir");
+				$scan_done = 1;
 
 				# Rescan the changed directory.
 				my $dirURL = Slim::Utils::Misc::fileURLFromPath($dir);
@@ -254,6 +258,18 @@ sub inotifyPoller() {
 				delete $touchedDirs{$dir};
 			}
 		}
+	}
+
+	# If a rescan was performed then do a database cleanup. This is necessary
+	# to remove items from the database that no longer exist - eg the old file
+	# if the file has been renamed or moved.
+	# Note that this might be slow since it has to traverse every file in the
+	# database - that shouldn't be too much of an annoyance, though, since
+	# the user is assumed to have just moved music around and it won't happen
+	# too often.
+	if ($scan_done) {
+		$log->info("One or more scans have been performed. Now performing cleanup");
+		Slim::Schema->cleanupStaleTrackEntries;
 	}
 
 	# Schedule another poll.
