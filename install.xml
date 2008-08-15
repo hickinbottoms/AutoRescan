@@ -43,5 +43,6 @@
 		<maxVersion>7.2+</maxVersion>
 	</targetApplication>
 
-	<targetPlatform>Linux</targetPlatform>
+<!--	<targetPlatform>Linux</targetPlatform> -->
+<!--	<targetPlatform>Windows</targetPlatform> -->
 </extension>

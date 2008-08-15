@@ -50,7 +50,9 @@ my $myPrefs = preferences('plugin.autorescan');
 sub new {
 	my $invocant = shift;
 	my $class = ref($invocant) || $invocant;
-	my $self = { };
+	my $self = {
+		poll_each => 0,
+	};
 	bless($self, $class);
 
 	$log->debug("Initialising inotify directory monitoring");

@@ -20,7 +20,7 @@
 # $Id$
 
 VERSION=1.0b5
-PERLSOURCE=Plugin.pm Settings.pm Monitor_Linux.pm
+PERLSOURCE=Plugin.pm Settings.pm Monitor_Linux.pm Monitor_Windows.pm
 HTMLSOURCE=HTML/EN/plugins/AutoRescan/settings/basic.html
 SOURCE=$(PERLSOURCE) $(HTMLSOURCE) INSTALL strings.txt install.xml LICENSE
 RELEASEDIR=releases

@@ -38,4 +38,8 @@ TROUBLESHOOTING
 @@HOWTO check@@
 @@HOWTO install@@
 
+
+WINDOWS SPECIALS
+Must be running the ActiveState perl version (ie run slimserver.pl directly).
+
 Copyright © Stuart Hickinbottom 2007-2008

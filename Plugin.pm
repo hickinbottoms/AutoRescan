@@ -25,6 +25,8 @@
 # where that kernel feature has been enabled. See the INSTALL file for further
 # instructions on the kernel configuration.
 #
+# @@TODO@@
+#
 # For further details see:
 # http://www.hickinbottom.com
 
@@ -37,7 +39,6 @@ use base qw(Slim::Plugin::Base);
 
 use utf8;
 use Plugins::AutoRescan::Settings;
-use Plugins::AutoRescan::Monitor_Linux;
 use Slim::Utils::Strings qw (string);
 use Slim::Utils::Timers;
 use Slim::Utils::Log;
@@ -123,10 +124,12 @@ sub initPlugin() {
 	my $os = Slim::Utils::OSDetect::OS();
 	if ($os eq 'unix') {
 		$log->debug('Linux monitoring method selected');
+		eval 'use Plugins::AutoRescan::Monitor_Linux';
 		$monitor = Plugins::AutoRescan::Monitor_Linux->new($class);
-	} elsif ($os eq 'windows') {
+	} elsif ($os eq 'win') {
 		$log->debug('Windows monitoring method selected');
-		#@@TODO@@
+		eval 'use Plugins::AutoRescan::Monitor_Windows';
+		$monitor = Plugins::AutoRescan::Monitor_Windows->new($class);
 	} else {
 		$log->warn("Unsupported operating system type '$os' - will not monitor for changes");
 	}
@@ -172,12 +175,12 @@ sub checkDefaults {
 	}
 }
 
-# Add an inotify watch to the music folder.
+# Add a watch to the music folder.
 sub addWatch() {
 	my $audioDir = $serverPrefs->get('audiodir');
 
 	if (defined $audioDir && -d $audioDir) {
-		$log->debug("Adding inotify monitor to music directory: $audioDir");
+		$log->debug("Adding monitor to music directory: $audioDir");
 
 		# Add the watch callback. This will also watch all subordinate folders.
 		addNotifierRecursive($audioDir);
@@ -215,16 +218,24 @@ sub addNotifier($) {
 		# Remember the monitor object created - we do this so we can check if
 		# it's already being monitored later on.
 		$monitors{$dir} = $monitor->addWatch($dir);
-	} else {
-		$log->debug("Not adding monitor, one is already present for: $dir");
 	}
 }
 
 # Called periodically so we can detect and dispatch any events.
 sub poller() {
 
-	# Pump that poller - let the monitors decide how to do that.
-	$monitor->poll if $monitor;
+	# Pump that poller - let the monitors decide how to do that. We support
+	# pumping for each monitored directory, or only once in total, depending
+	# on what the monitor type wants to do.
+	if ($monitor && $monitor->{poll_each}) {
+		# Loop through the monitored directories and poll each.
+		for my $dir (keys %monitors) {
+			$monitor->poll($dir, $monitors{$dir});
+		}
+	} else {
+		# Pump the poller once.
+		$monitor->poll if $monitor;
+	}
 
 	# Flag of whether any rescanning was performed.
 	my $scan_done = 0;
@@ -263,6 +274,9 @@ sub poller() {
 				Slim::Utils::Misc::findAndScanDirectoryTree( { obj => $dirObject } );
 				
 				delete $touchedDirs{$dir};
+
+				# Make sure we are monitoring any new subdirectories under here.
+				addNotifierRecursive($dir);
 			}
 		}
 	}
