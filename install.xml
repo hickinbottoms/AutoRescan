@@ -40,7 +40,7 @@
 	<targetApplication>
 		<id>SqueezeCentre</id>
 		<minVersion>7.0a</minVersion>
-		<maxVersion>7.1+</maxVersion>
+		<maxVersion>7.2+</maxVersion>
 	</targetApplication>
 
 	<targetPlatform>Linux</targetPlatform>

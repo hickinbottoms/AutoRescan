@@ -37,6 +37,7 @@ use base qw(Slim::Plugin::Base);
 
 use utf8;
 use Plugins::AutoRescan::Settings;
+use Plugins::AutoRescan::Monitor_Linux;
 use Slim::Utils::Strings qw (string);
 use Slim::Utils::Timers;
 use Slim::Utils::Log;
@@ -45,7 +46,7 @@ use Time::HiRes;
 use Scalar::Util qw(blessed);
 use File::Find;
 use File::Basename;
-use Linux::Inotify2;
+use Slim::Utils::OSDetect;
 
 # Name of this plugin - used for various global things to prevent clashes with
 # other plugins.
@@ -54,12 +55,12 @@ use constant PLUGIN_NAME => 'PLUGIN_AUTORESCAN';
 # Preference ranges and defaults.
 use constant AUTORESCAN_DELAY_DEFAULT => 5;
 
-# Other constants.
-use constant AUTORESCAN_INOTIFY_POLL => 1;
+# Polling control.
+use constant AUTORESCAN_POLL => 1;
 
 # Export the version to the server (as a subversion keyword).
 use vars qw($VERSION);
-$VERSION = 'v@@VERSION@@ (trunk-7.0)';
+$VERSION = 'v@@VERSION@@ (trunk-7.x)';
 
 # A logger we will use to write plugin-specific messages.
 my $log = Slim::Utils::Log->addLogCategory(
@@ -70,9 +71,9 @@ my $log = Slim::Utils::Log->addLogCategory(
 	}
 );
 
-# Our notification object (we actually create it when the plugin is
-# initialising).
-my $inotify;
+# Monitor object that contains the platform-specific functionality for
+# monitoring directories for changes.
+my $monitor;
 
 # Hash so we can track directory monitors.
 my %monitors;
@@ -118,25 +119,35 @@ sub initPlugin() {
 	# on them later.
 	checkDefaults();
 
-	# Create the inotify interface object and start watching.
-	$inotify = new Linux::Inotify2;
-	if (!$inotify) {
-		$log->debug("Unable to initialise inotify interface - is it compiled into the kernel?");
+	# Create the monitor interface, depending on our current platorm.
+	my $os = Slim::Utils::OSDetect::OS();
+	if ($os eq 'unix') {
+		$log->debug('Linux monitoring method selected');
+		$monitor = Plugins::AutoRescan::Monitor_Linux->new($class);
+	} elsif ($os eq 'windows') {
+		$log->debug('Windows monitoring method selected');
+		#@@TODO@@
 	} else {
-		addWatch();
+		$log->warn("Unsupported operating system type '$os' - will not monitor for changes");
 	}
+
+	# If initialisation worked then add monitors.
+	addWatch() if ($monitor);
 
 	$log->debug("Initialisation complete");
 }
 
 # Called when the plugin is being disabled or SqueezeCenter shut down.
 sub shutdownPlugin() {
+
+	my $class = shift;
+
 	return if !$initialised;    # don't need to do it twice
 
 	$log->debug("Shutting down");
 
-	# Discard our inotify interface.
-	my $inotify = undef;
+	# Shutdown the monitor.
+	$monitor->delete if $monitor;
 
 	# We're no longer initialised.
 	$initialised = 0;
@@ -168,16 +179,14 @@ sub addWatch() {
 	if (defined $audioDir && -d $audioDir) {
 		$log->debug("Adding inotify monitor to music directory: $audioDir");
 
-		# We don't operate in blocking mode - we're going to poll for changes
-		# to make sure SqueezeCenter keeps running.
-		$inotify->blocking(0);
-
 		# Add the watch callback. This will also watch all subordinate folders.
 		addNotifierRecursive($audioDir);
 
-		# Add a poller callback timer. We need this to pump events from inotify
-		# since we're running it in non-blocking mode.
-		Slim::Utils::Timers::setTimer(undef, Time::HiRes::time() + AUTORESCAN_INOTIFY_POLL, \&inotifyPoller);
+		# Tell the monitor.
+		$monitor->addDone if $monitor;
+
+		# Add a poller callback timer. We need this to pump events.
+		Slim::Utils::Timers::setTimer(undef, Time::HiRes::time() + AUTORESCAN_POLL, \&poller);
 
 	} else {
 		$log->info("Music folder is not defined - skipping add of change monitor");
@@ -196,28 +205,26 @@ sub addNotifierRecursive($) {
 	}
 }
 
-# Add an inotify monitor for a given directory.
+# Add an monitor for a given directory.
 sub addNotifier($) {
 	my $dir = shift;
 
 	# Only add a monitor if we're not already monitoring this directory (and
 	# it is indeed a directory).
 	if (not exists $monitors{$dir} && -d $dir) {
-		$log->debug("Adding directory monitor for: $dir");
-
 		# Remember the monitor object created - we do this so we can check if
 		# it's already being monitored later on.
-		$monitors{$dir} = $inotify->watch($dir, IN_MODIFY | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE | IN_DELETE_SELF, \&watchCallback);
+		$monitors{$dir} = $monitor->addWatch($dir);
 	} else {
 		$log->debug("Not adding monitor, one is already present for: $dir");
 	}
 }
 
-# Called periodically so we can detect and dispatch any inotify events.
-sub inotifyPoller() {
+# Called periodically so we can detect and dispatch any events.
+sub poller() {
 
-	# Pump that poller.
-	$inotify->poll;
+	# Pump that poller - let the monitors decide how to do that.
+	$monitor->poll if $monitor;
 
 	# Flag of whether any rescanning was performed.
 	my $scan_done = 0;
@@ -273,63 +280,11 @@ sub inotifyPoller() {
 	}
 
 	# Schedule another poll.
-	Slim::Utils::Timers::setTimer(undef, Time::HiRes::time() + AUTORESCAN_INOTIFY_POLL, \&inotifyPoller);
-}
-
-# Called when any modification event is detected by inotify.
-sub watchCallback() {
-	my $e = shift;
-
-	my $filename = $e->fullname;
-	my $is_directory = $e->IN_ISDIR;
-	my $was_created = $e->IN_CREATE;
-	my $was_modified = $e->IN_MODIFY;
-	my $was_deleted = $e->IN_DELETE;
-	my $was_moved_to = $e->IN_MOVED_TO;
-	my $was_moved_from = $e->IN_MOVED_FROM;
-	my $dir_name = dirname($filename);
-	$log->debug("Received inotify event for: $filename (is_directory=$is_directory, was_created=$was_created, was_modified=$was_modified, was_deleted=$was_deleted, was_moved_from=$was_moved_from, was_moved_to=$was_moved_to");
-
-	if ($was_created && $is_directory) {
-		$log->info("New directory created: $filename");
-		addNotifierRecursive($filename);
-
-		noteTouch($filename);
-		
-	} elsif ($was_created && not $is_directory) {
-		$log->info("Directory detected as modified by file creation: $dir_name");
-
-		noteTouch($dir_name);
-
-	} elsif ($was_modified && not $is_directory) {
-		$log->info("Directory detected as modified by file modification: $dir_name");
-
-		noteTouch($dir_name);
-	} elsif ($was_deleted && not $is_directory) {
-		$log->info("Directory detected as modified by file deletion: $dir_name");
-
-		noteTouch($dir_name);
-	} elsif ($was_moved_to && $is_directory) {
-		$log->info("Directory detected as moved in: $filename");
-
-		noteTouch($filename);
-	} elsif ($was_moved_to && not $is_directory) {
-		$log->info("Directory detected as modified by move in: $dir_name");
-
-		noteTouch($dir_name);
-	} elsif ($was_moved_from && $is_directory && -d $filename) {
-		$log->info("Directory detected as modified out: $filename");
-
-		noteTouch($filename);
-	} elsif ($was_moved_from && not $is_directory) {
-		$log->info("Directory detected as modified by move out: $dir_name");
-
-		noteTouch($dir_name);
-	}
+	Slim::Utils::Timers::setTimer(undef, Time::HiRes::time() + AUTORESCAN_POLL, \&poller);
 }
 
 # Note a directory as having been touched.
-sub noteTouch($) {
+sub noteTouch {
 	my $dir = shift;
 
 	# Note the time the directory was touched. If we already had it monitored
