@@ -255,23 +255,27 @@ sub poller() {
 
 				# Rescan the changed directory.
 				my $dirURL = Slim::Utils::Misc::fileURLFromPath($dir);
-				my $dirObject = Slim::Schema->rs('Track')->objectForUrl({
+
+				# Do a quick directory scan.
+				Slim::Utils::Scanner->scanDirectory({
+					'url'       => $dir,
+					'recursive' => 1,                                                           });
+
+				# Bug: 4812 - notify those interested that the database has changed.
+				Slim::Control::Request::notifyFromArray(undef, [qw(rescan done)]);
+				# Bug: 3841 - check for new artwork
+				# But don't search at the root level.
+				if ($dirURL ne $serverPrefs->get('audiodir')) {
+					my $dirObject = Slim::Schema->rs('Track')->objectForUrl({
 						'url'      => $dirURL,
 						'create'   => 1,
 						'readTags' => 1,
 						'commit'   => 1,
 					});
 
-				# This bodge is necessary to fool the scan function into
-				# looking into this directory even though its modification time
-				# may not have changed from that in the database. This can
-				# happen if individual files are touched (eg though editing
-				# their tags), which won't normally have the effect of touching
-				# the directory.
-				$dirObject->set_column('timestamp', $dirObject+1);
+					Slim::Music::Artwork->findArtwork($dirObject);
+				}
 
-				# Now ask for the directory to be rescanned.
-				Slim::Utils::Misc::findAndScanDirectoryTree( { obj => $dirObject } );
 				
 				delete $touchedDirs{$dir};
 
