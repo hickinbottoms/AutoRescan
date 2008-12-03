@@ -39,10 +39,10 @@
 
 	<targetApplication>
 		<id>SqueezeCentre</id>
-		<minVersion>7.0a</minVersion>
+		<minVersion>7.2</minVersion>
 		<maxVersion>7.2+</maxVersion>
 	</targetApplication>
 
-<!--	<targetPlatform>Linux</targetPlatform> -->
-<!--	<targetPlatform>Windows</targetPlatform> -->
+	<targetPlatform>Linux</targetPlatform>
+	<targetPlatform>Windows</targetPlatform>
 </extension>
