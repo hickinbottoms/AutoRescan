@@ -121,7 +121,6 @@ sub watchCallback() {
 
 	if ($was_created && $is_directory) {
 		$log->info("New directory created: $filename");
-		Plugins::AutoRescan::Plugin::addNotifierRecursive($filename);
 
 		Plugins::AutoRescan::Plugin::noteTouch($filename);
 		

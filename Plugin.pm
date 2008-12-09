@@ -25,8 +25,6 @@
 # where that kernel feature has been enabled. See the INSTALL file for further
 # instructions on the kernel configuration.
 #
-# @@TODO@@
-#
 # For further details see:
 # http://www.hickinbottom.com
 
@@ -78,9 +76,6 @@ my $monitor;
 
 # Hash so we can track directory monitors.
 my %monitors;
-
-# Hash of directories detected as touched.
-my %touchedDirs;
 
 # Access to preferences for this plugin and for server-wide settings.
 my $myPrefs     = preferences('plugin.autorescan');
@@ -149,7 +144,12 @@ sub shutdownPlugin() {
 
 	$log->debug("Shutting down");
 
+	# If we've still got a pending callback timer then cancel it so we're
+	# not called back after shutdown.
+	killCallbackTimer();
+
 	# Shutdown the monitor.
+	$log->debug("Removing change monitor");
 	$monitor->delete if $monitor;
 
 	# We're no longer initialised.
@@ -237,66 +237,6 @@ sub poller() {
 		$monitor->poll if $monitor;
 	}
 
-	# Flag of whether any rescanning was performed.
-	my $scan_done = 0;
-
-	# We don't perform any rescanning if a scan is currently underway - we
-	# defer it until it's finished.
-	if (not Slim::Music::Import->stillScanning()) {
-
-		# If there are any touched directories that are older than our delay
-		# time then rescan them and remove them from our hash of tracked
-		# directories.
-		my $triggerTime = Time::HiRes::time() - $myPrefs->get('delay');
-		for my $dir (keys %touchedDirs) {
-			if ($touchedDirs{$dir} < $triggerTime) {
-				$log->info("Triggering RESCAN of folder: $dir");
-				$scan_done = 1;
-
-				# Rescan the changed directory.
-				my $dirURL = Slim::Utils::Misc::fileURLFromPath($dir);
-
-				# Do a quick directory scan.
-				Slim::Utils::Scanner->scanDirectory({
-					'url'       => $dir,
-					'recursive' => 1,                                                           });
-
-				# Bug: 4812 - notify those interested that the database has changed.
-				Slim::Control::Request::notifyFromArray(undef, [qw(rescan done)]);
-				# Bug: 3841 - check for new artwork
-				# But don't search at the root level.
-				if ($dirURL ne $serverPrefs->get('audiodir')) {
-					my $dirObject = Slim::Schema->rs('Track')->objectForUrl({
-						'url'      => $dirURL,
-						'create'   => 1,
-						'readTags' => 1,
-						'commit'   => 1,
-					});
-
-					Slim::Music::Artwork->findArtwork($dirObject);
-				}
-
-				
-				delete $touchedDirs{$dir};
-
-				# Make sure we are monitoring any new subdirectories under here.
-				addNotifierRecursive($dir);
-			}
-		}
-	}
-
-	# If a rescan was performed then do a database cleanup. This is necessary
-	# to remove items from the database that no longer exist - eg the old file
-	# if the file has been renamed or moved.
-	# Note that this might be slow since it has to traverse every file in the
-	# database - that shouldn't be too much of an annoyance, though, since
-	# the user is assumed to have just moved music around and it won't happen
-	# too often.
-	if ($scan_done) {
-		$log->info("One or more scans have been performed. Now performing cleanup");
-		Slim::Schema->cleanupStaleTrackEntries;
-	}
-
 	# Schedule another poll.
 	Slim::Utils::Timers::setTimer(undef, Time::HiRes::time() + AUTORESCAN_POLL, \&poller);
 }
@@ -305,10 +245,49 @@ sub poller() {
 sub noteTouch {
 	my $dir = shift;
 
-	# Note the time the directory was touched. If we already had it monitored
-	# then we just touch the time that was already there. That way we won't
-	# repeatedly rescan directories as they are being populated etc.
-	$touchedDirs{$dir} = Time::HiRes::time();
+	$log->debug("Noting touch of dir: $dir");
+
+	# Schedule a callback to trigger a rescan in a short time.
+	setCallbackTimer();
+
+	# Make sure we are monitoring any new subdirectories under here.
+	addNotifierRecursive($dir);
+}
+
+# Remove any existing delayed callback timer. This is tolerant if there's
+# currently no timer set.
+sub killCallbackTimer {
+	$log->debug("Cancelling any pending change callback");
+	Slim::Utils::Timers::killOneTimer(undef, \&delayedChangeCallback);
+}
+
+# Add a new callback timer to call us back in a short while.
+sub setCallbackTimer {
+	
+	# Remove any existing timer.
+	killCallbackTimer();
+
+	# Schedule a callback.
+	$log->debug("Scheduling a delayed callback following change to dir: $dir");
+	Slim::Utils::Timers::setTimer( undef, Time::HiRes::time() + $myPrefs->get('delay'), \&delayedChangeCallback );
+}
+
+# Called following a short delay following the most recently detected change.
+# This is what ultimately triggers the database rescan.
+sub delayedChangeCallback {
+	$log->debug("Delayed callback invoked");
+
+	# Check if there's a scan currently in progress.
+	if (Slim::Music::Import->stillScanning()) {
+		# If so then schedule another delayed callback - we'll try again in a short
+		# while.
+		setCallbackTimer();
+	} else {
+	
+		# If not then we'll trigger the rescan now.
+		#@@TODO@@
+		$log->debug("Triggering database rescan following recent monitored directory changes");
+	}
 }
 
 1;
