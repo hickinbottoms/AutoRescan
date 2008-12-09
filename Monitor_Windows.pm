@@ -45,11 +45,9 @@ my $myPrefs = preferences('plugin.autorescan');
 # Initialise this monitor, as an object.
 sub new {
 	my $invocant = shift;
-	my $class = ref($invocant) || $invocant;
-	my $self = {
-		poll_each => 1,
-	};
-	bless($self, $class);
+	my $class    = ref($invocant) || $invocant;
+	my $self     = { poll_each => 1, };
+	bless( $self, $class );
 
 	$log->debug("Initialising ChangeNotify directory monitoring");
 
@@ -65,11 +63,13 @@ sub delete {
 # Add a watch for a specified directory.
 sub addWatch {
 	my $class = shift;
-	my $dir = shift;
+	my $dir   = shift;
 
 	$log->debug("Adding ChangeNotify watch for: $dir");
 
-	return Win32::ChangeNotify->new($dir, 0, FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE);
+	return Win32::ChangeNotify->new( $dir, 0,
+		FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_FILE_NAME |
+		  FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE );
 }
 
 # Nothing to do in this plugin.
@@ -80,13 +80,13 @@ sub addDone {
 # Pump ChangeNotify events.
 sub poll {
 	my $class = shift;
-	my $dir = shift;
-	my $cn = shift;
+	my $dir   = shift;
+	my $cn    = shift;
 
 	# See if the monitor IPC object signals a change. We do that in
 	# non-blocking mode.
 	my $result = $cn->wait(0);
-	if ($result == 1) {
+	if ( $result == 1 ) {
 
 		# A change was reported so deal with it and reset the monitor so
 		# it will continue to report changes.

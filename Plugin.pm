@@ -117,16 +117,18 @@ sub initPlugin() {
 
 	# Create the monitor interface, depending on our current platorm.
 	my $os = Slim::Utils::OSDetect::OS();
-	if ($os eq 'unix') {
+	if ( $os eq 'unix' ) {
 		$log->debug('Linux monitoring method selected');
 		eval 'use Plugins::AutoRescan::Monitor_Linux';
 		$monitor = Plugins::AutoRescan::Monitor_Linux->new($class);
-	} elsif ($os eq 'win') {
+	} elsif ( $os eq 'win' ) {
 		$log->debug('Windows monitoring method selected');
 		eval 'use Plugins::AutoRescan::Monitor_Windows';
 		$monitor = Plugins::AutoRescan::Monitor_Windows->new($class);
 	} else {
-		$log->warn("Unsupported operating system type '$os' - will not monitor for changes");
+		$log->warn(
+"Unsupported operating system type '$os' - will not monitor for changes"
+		);
 	}
 
 	# If initialisation worked then add monitors.
@@ -179,7 +181,7 @@ sub checkDefaults {
 sub addWatch() {
 	my $audioDir = $serverPrefs->get('audiodir');
 
-	if (defined $audioDir && -d $audioDir) {
+	if ( defined $audioDir && -d $audioDir ) {
 		$log->debug("Adding monitor to music directory: $audioDir");
 
 		# Add the watch callback. This will also watch all subordinate folders.
@@ -189,10 +191,12 @@ sub addWatch() {
 		$monitor->addDone if $monitor;
 
 		# Add a poller callback timer. We need this to pump events.
-		Slim::Utils::Timers::setTimer(undef, Time::HiRes::time() + AUTORESCAN_POLL, \&poller);
+		Slim::Utils::Timers::setTimer( undef,
+			Time::HiRes::time() + AUTORESCAN_POLL, \&poller );
 
 	} else {
-		$log->info("Music folder is not defined - skipping add of change monitor");
+		$log->info(
+			"Music folder is not defined - skipping add of change monitor");
 	}
 
 }
@@ -201,10 +205,17 @@ sub addWatch() {
 sub addNotifierRecursive($) {
 	my $dir = shift;
 
-	if (-d $dir) {
-		find({ wanted => sub {
-				addNotifier($File::Find::name) if -d $File::Find::name;
-			}, follow => 1, no_chdir => 1 }, $dir);
+	if ( -d $dir ) {
+		find(
+			{
+				wanted => sub {
+					addNotifier($File::Find::name) if -d $File::Find::name;
+				},
+				follow   => 1,
+				no_chdir => 1
+			},
+			$dir
+		);
 	}
 }
 
@@ -214,7 +225,8 @@ sub addNotifier($) {
 
 	# Only add a monitor if we're not already monitoring this directory (and
 	# it is indeed a directory).
-	if (not exists $monitors{$dir} && -d $dir) {
+	if ( not exists $monitors{$dir} && -d $dir ) {
+
 		# Remember the monitor object created - we do this so we can check if
 		# it's already being monitored later on.
 		$monitors{$dir} = $monitor->addWatch($dir);
@@ -227,25 +239,27 @@ sub poller() {
 	# Pump that poller - let the monitors decide how to do that. We support
 	# pumping for each monitored directory, or only once in total, depending
 	# on what the monitor type wants to do.
-	if ($monitor && $monitor->{poll_each}) {
+	if ( $monitor && $monitor->{poll_each} ) {
+
 		# Loop through the monitored directories and poll each.
-		for my $dir (keys %monitors) {
-			$monitor->poll($dir, $monitors{$dir});
+		for my $dir ( keys %monitors ) {
+			$monitor->poll( $dir, $monitors{$dir} );
 		}
 	} else {
+
 		# Pump the poller once.
 		$monitor->poll if $monitor;
 	}
 
 	# Schedule another poll.
-	Slim::Utils::Timers::setTimer(undef, Time::HiRes::time() + AUTORESCAN_POLL, \&poller);
+	Slim::Utils::Timers::setTimer( undef, Time::HiRes::time() + AUTORESCAN_POLL,
+		\&poller );
 }
 
-# Note a directory as having been touched.
+# Note a directory as having been touched - we schedule a callback to see if
+# it's convenient to perform a rescan.
 sub noteTouch {
 	my $dir = shift;
-
-	$log->debug("Noting touch of dir: $dir");
 
 	# Schedule a callback to trigger a rescan in a short time.
 	setCallbackTimer();
@@ -258,18 +272,20 @@ sub noteTouch {
 # currently no timer set.
 sub killCallbackTimer {
 	$log->debug("Cancelling any pending change callback");
-	Slim::Utils::Timers::killOneTimer(undef, \&delayedChangeCallback);
+	Slim::Utils::Timers::killOneTimer( undef, \&delayedChangeCallback );
 }
 
 # Add a new callback timer to call us back in a short while.
 sub setCallbackTimer {
-	
+
 	# Remove any existing timer.
 	killCallbackTimer();
 
 	# Schedule a callback.
-	$log->debug("Scheduling a delayed callback following change to dir: $dir");
-	Slim::Utils::Timers::setTimer( undef, Time::HiRes::time() + $myPrefs->get('delay'), \&delayedChangeCallback );
+	$log->debug("Scheduling a delayed callback");
+	Slim::Utils::Timers::setTimer( undef,
+		Time::HiRes::time() + $myPrefs->get('delay'),
+		\&delayedChangeCallback );
 }
 
 # Called following a short delay following the most recently detected change.
@@ -278,15 +294,17 @@ sub delayedChangeCallback {
 	$log->debug("Delayed callback invoked");
 
 	# Check if there's a scan currently in progress.
-	if (Slim::Music::Import->stillScanning()) {
-		# If so then schedule another delayed callback - we'll try again in a short
-		# while.
+	if ( Slim::Music::Import->stillScanning() ) {
+
+	 # If so then schedule another delayed callback - we'll try again in a short
+	 # while.
+		$log->debug("Putting off rescan due to current scan being in progress");
 		setCallbackTimer();
 	} else {
-	
+
 		# If not then we'll trigger the rescan now.
-		#@@TODO@@
-		$log->debug("Triggering database rescan following recent monitored directory changes");
+		$log->info("Triggering database rescan following directory changes");
+		Slim::Control::Request::executeRequest( undef, ['rescan'] );
 	}
 }
 

@@ -35,7 +35,7 @@ SETUP_PLUGIN_AUTORESCAN_DELAY_HEAD
 	EN	Delays and timings
 
 SETUP_PLUGIN_AUTORESCAN_DELAY_DESC
-	EN	This setting controls the amount of time after a change is detected that a rescan of the modified folders will be performed. This can be used to prevent multiple rescans from being performed when multiple changes are occurring (such as when multiple files are being copied).
+	EN	This setting controls the amount of time after a change is detected that a rescan of the modified folders will be performed. It doesn't matter if multiple files are being copied, or that the copy may take longer than this time, since the plugin will perform another rescan if additional changes were made. This setting therefore just helps to avoid more scans than necessary and can be safely left at the default.
 
 SETUP_PLUGIN_AUTORESCAN_DELAY_CHOOSE
 	EN	Rescan delay (seconds):

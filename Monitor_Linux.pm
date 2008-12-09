@@ -49,18 +49,18 @@ my $myPrefs = preferences('plugin.autorescan');
 # Initialise this monitor, as an object.
 sub new {
 	my $invocant = shift;
-	my $class = ref($invocant) || $invocant;
-	my $self = {
-		poll_each => 0,
-	};
-	bless($self, $class);
+	my $class    = ref($invocant) || $invocant;
+	my $self     = { poll_each => 0, };
+	bless( $self, $class );
 
 	$log->debug("Initialising inotify directory monitoring");
 
 	# Create the inotify interface object and start watching.
 	$inotify = new Linux::Inotify2;
-	if (!$inotify) {
-		$log->debug("Unable to initialise inotify interface - is it compiled into the kernel?");
+	if ( !$inotify ) {
+		$log->debug(
+"Unable to initialise inotify interface - is it compiled into the kernel?"
+		);
 
 		return undef;
 	}
@@ -84,13 +84,18 @@ sub delete {
 # Add a watch for a specified directory.
 sub addWatch {
 	my $class = shift;
-	my $dir = shift;
+	my $dir   = shift;
 
 	return if !$inotify;
 
 	$log->debug("Adding inotify watch for: $dir");
 
-	return $inotify->watch($dir, IN_MODIFY | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE | IN_DELETE_SELF, \&watchCallback);
+	return $inotify->watch(
+		$dir,
+		IN_MODIFY | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE |
+		  IN_DELETE_SELF,
+		\&watchCallback
+	);
 }
 
 # Nothing to do in this plugin.
@@ -109,47 +114,52 @@ sub poll {
 sub watchCallback() {
 	my $e = shift;
 
-	my $filename = $e->fullname;
-	my $is_directory = $e->IN_ISDIR;
-	my $was_created = $e->IN_CREATE;
-	my $was_modified = $e->IN_MODIFY;
-	my $was_deleted = $e->IN_DELETE;
-	my $was_moved_to = $e->IN_MOVED_TO;
+	my $filename       = $e->fullname;
+	my $is_directory   = $e->IN_ISDIR;
+	my $was_created    = $e->IN_CREATE;
+	my $was_modified   = $e->IN_MODIFY;
+	my $was_deleted    = $e->IN_DELETE;
+	my $was_moved_to   = $e->IN_MOVED_TO;
 	my $was_moved_from = $e->IN_MOVED_FROM;
-	my $dir_name = dirname($filename);
-	$log->debug("Received inotify event for: $filename (is_directory=$is_directory, was_created=$was_created, was_modified=$was_modified, was_deleted=$was_deleted, was_moved_from=$was_moved_from, was_moved_to=$was_moved_to");
+	my $dir_name       = dirname($filename);
+	$log->debug(
+"Received inotify event for: $filename (is_directory=$is_directory, was_created=$was_created, was_modified=$was_modified, was_deleted=$was_deleted, was_moved_from=$was_moved_from, was_moved_to=$was_moved_to"
+	);
 
-	if ($was_created && $is_directory) {
+	if ( $was_created && $is_directory ) {
 		$log->info("New directory created: $filename");
 
 		Plugins::AutoRescan::Plugin::noteTouch($filename);
-		
-	} elsif ($was_created && not $is_directory) {
-		$log->info("Directory detected as modified by file creation: $dir_name");
+
+	} elsif ( $was_created && not $is_directory ) {
+		$log->info(
+			"Directory detected as modified by file creation: $dir_name");
 
 		Plugins::AutoRescan::Plugin::noteTouch($dir_name);
 
-	} elsif ($was_modified && not $is_directory) {
-		$log->info("Directory detected as modified by file modification: $dir_name");
+	} elsif ( $was_modified && not $is_directory ) {
+		$log->info(
+			"Directory detected as modified by file modification: $dir_name");
 
 		Plugins::AutoRescan::Plugin::noteTouch($dir_name);
-	} elsif ($was_deleted && not $is_directory) {
-		$log->info("Directory detected as modified by file deletion: $dir_name");
+	} elsif ( $was_deleted && not $is_directory ) {
+		$log->info(
+			"Directory detected as modified by file deletion: $dir_name");
 
 		Plugins::AutoRescan::Plugin::noteTouch($dir_name);
-	} elsif ($was_moved_to && $is_directory) {
+	} elsif ( $was_moved_to && $is_directory ) {
 		$log->info("Directory detected as moved in: $filename");
 
 		Plugins::AutoRescan::Plugin::noteTouch($filename);
-	} elsif ($was_moved_to && not $is_directory) {
+	} elsif ( $was_moved_to && not $is_directory ) {
 		$log->info("Directory detected as modified by move in: $dir_name");
 
 		Plugins::AutoRescan::Plugin::noteTouch($dir_name);
-	} elsif ($was_moved_from && $is_directory && -d $filename) {
+	} elsif ( $was_moved_from && $is_directory && -d $filename ) {
 		$log->info("Directory detected as modified out: $filename");
 
 		Plugins::AutoRescan::Plugin::noteTouch($filename);
-	} elsif ($was_moved_from && not $is_directory) {
+	} elsif ( $was_moved_from && not $is_directory ) {
 		$log->info("Directory detected as modified by move out: $dir_name");
 
 		Plugins::AutoRescan::Plugin::noteTouch($dir_name);

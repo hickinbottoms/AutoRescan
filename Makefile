@@ -29,10 +29,10 @@ SLIMDIR=/usr/local/squeezecenter/server
 PLUGINSDIR=$(SLIMDIR)/Plugins
 PLUGINDIR=AutoRescan
 REVISION=`svn info . | grep "^Revision:" | cut -d' ' -f2`
-DISTFILE=AutoRescan-$(VERSION).tgz
+DISTFILE=AutoRescan-$(VERSION).zip
 DISTFILEDIR=$(RELEASEDIR)/$(DISTFILE)
-SVNDISTFILE=AutoRescan.tgz
-LATESTLINK=$(RELEASEDIR)/AutoRescan-latest.tgz
+SVNDISTFILE=AutoRescan.zip
+LATESTLINK=$(RELEASEDIR)/AutoRescan-latest.zip
 PREFS=/etc/squeezecenter.pref
 
 .SILENT:
@@ -98,7 +98,7 @@ release: make-stage
 	echo Building distfile: $(DISTFILE)
 	echo Remember to have committed and updated first.
 	-rm "$(DISTFILEDIR)" >/dev/null 2>&1
-	(cd "$(STAGEDIR)" && tar czvf "../$(DISTFILEDIR)" "$(PLUGINDIR)")
+	(cd "$(STAGEDIR)" && zip -r "../$(DISTFILEDIR)" "$(PLUGINDIR)")
 	-rm "$(LATESTLINK)" >/dev/null 2>&1
 	ln -s "$(DISTFILE)" "$(LATESTLINK)"
 	cp $(DISTFILEDIR) $(SVNDISTFILE)
