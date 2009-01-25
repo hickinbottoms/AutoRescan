@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<todo version="0.1.20">
+    <note priority="medium" time="1196094141" done="1197024189">
+        Make sure that multiple changes don't cause trouble; push changed directories into a store and only rescan them when they've not been notified as changed until beyond the delay time.
+    </note>
+    <note priority="medium" time="1197024202" done="1197044865">
+        Get $Id$ keyword expansion enabled for all source files.
+    </note>
+    <note priority="medium" time="1196092466" done="1197044872">
+        Make plugin detect we're on Linux and only do things if we are.
+    </note>
+    <note priority="medium" time="1196092486" done="1197044873">
+        Make plugin check for the presence of Inotify2 and report nicely if it isn't available.
+    </note>
+</todo>
