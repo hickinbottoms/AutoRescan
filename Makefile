@@ -45,13 +45,11 @@ FORCE:
 
 make-stage:
 	echo "Creating plugin stage files (v$(VERSION))..."
-	-chmod -R +w $(STAGEDIR)/* >/dev/null 2>&1
 	-rm -rf $(STAGEDIR)/* >/dev/null 2>&1
 	for FILE in $(SOURCE); do \
 		mkdir -p "$(STAGEDIR)/$(PLUGINDIR)/`dirname $$FILE`"; \
 		sed "s/@@VERSION@@/$(VERSION)/" <"$$FILE" >"$(STAGEDIR)/$(PLUGINDIR)/$$FILE"; \
 	done
-	chmod -R -w $(STAGEDIR)/*
 
 # Regenerate tags.
 tags: $(PERLSOURCE)
@@ -71,7 +69,6 @@ install: make-stage
 	-[[ -d "$(PLUGINSDIR)/$(PLUGINDIR)" ]] && sudo chmod -R +w "$(PLUGINSDIR)/$(PLUGINDIR)"
 	-[[ -d "$(PLUGINSDIR)/$(PLUGINDIR)" ]] && sudo rm -r "$(PLUGINSDIR)/$(PLUGINDIR)"
 	sudo cp -r "$(STAGEDIR)/$(PLUGINDIR)" "$(PLUGINSDIR)"
-	sudo chmod -R -w "$(PLUGINSDIR)/$(PLUGINDIR)"
 
 # Restart SqueezeCentre, quite forcefully. This is obviously quite
 # Gentoo-specific.

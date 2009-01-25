@@ -33,14 +33,14 @@
 
 	<defaultState>enabled</defaultState>
         
-	<homepageURL>http://www.hickinbottom.com</homepageURL>
+	<homepageURL>http://www.hickinbottom.com/autorescan</homepageURL>
 	<optionsURL>plugins/AutoRescan/settings/basic.html</optionsURL>
 	<type>2</type>
 
 	<targetApplication>
 		<id>SqueezeCentre</id>
 		<minVersion>7.2</minVersion>
-		<maxVersion>7.3+</maxVersion>
+		<maxVersion>7.4+</maxVersion>
 	</targetApplication>
 
 	<targetPlatform>Linux</targetPlatform>
