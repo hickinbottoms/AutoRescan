@@ -1,5 +1,5 @@
 # Windows directory monitoring for AutoRescan plugin for SqueezeCentre.
-# Copyright © Stuart Hickinbottom 2007-2008
+# Copyright © Stuart Hickinbottom 2007-2009
 
 # This file is part of AutoRescan
 #

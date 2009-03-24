@@ -1,5 +1,5 @@
 # Makefile for AutoRescan plugin for SqueezeCentre 7.0 (and later)
-# Copyright © Stuart Hickinbottom 2007-2008
+# Copyright © Stuart Hickinbottom 2007-2009
 
 # This file is part of AutoRescan.
 #
