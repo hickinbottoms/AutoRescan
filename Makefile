@@ -19,7 +19,7 @@
 
 # $Id$
 
-VERSION=1.0b6
+VERSION=1.0b7
 PERLSOURCE=Plugin.pm Settings.pm Monitor_Linux.pm Monitor_Windows.pm
 HTMLSOURCE=HTML/EN/plugins/AutoRescan/settings/basic.html
 SOURCE=$(PERLSOURCE) $(HTMLSOURCE) INSTALL strings.txt install.xml LICENSE
@@ -28,7 +28,7 @@ STAGEDIR=stage
 SLIMDIR=/usr/local/squeezecenter/server
 PLUGINSDIR=$(SLIMDIR)/Plugins
 PLUGINDIR=AutoRescan
-REVISION=`svn info . | grep "^Revision:" | cut -d' ' -f2`
+COMMIT=`git log -1 --pretty=format:%H`
 DISTFILE=AutoRescan-$(VERSION).zip
 DISTFILEDIR=$(RELEASEDIR)/$(DISTFILE)
 SVNDISTFILE=AutoRescan.zip
@@ -44,12 +44,14 @@ all:
 FORCE:
 
 make-stage:
-	echo "Creating plugin stage files (v$(VERSION))..."
+	echo "Creating stage files (v$(VERSION)/$(COMMIT))..."
+#	-chmod -R +w $(STAGEDIR)/* >/dev/null 2>&1
 	-rm -rf $(STAGEDIR)/* >/dev/null 2>&1
 	for FILE in $(SOURCE); do \
 		mkdir -p "$(STAGEDIR)/$(PLUGINDIR)/`dirname $$FILE`"; \
-		sed "s/@@VERSION@@/$(VERSION)/" <"$$FILE" >"$(STAGEDIR)/$(PLUGINDIR)/$$FILE"; \
+		sed "s/@@VERSION@@/$(VERSION)/;s/@@COMMIT@@/$(COMMIT)/" <"$$FILE" >"$(STAGEDIR)/$(PLUGINDIR)/$$FILE"; \
 	done
+#	chmod -R -w $(STAGEDIR)/*
 
 # Regenerate tags.
 tags: $(PERLSOURCE)
@@ -89,7 +91,6 @@ logtail:
 	echo "Following the end of the SqueezeCentre log..."
 	multitail -f /var/log/squeezecenter/server.log
 
-# TODO - fix this for new package layout
 # Build a distribution package for this Plugin.
 release: make-stage
 	echo Building distfile: $(DISTFILE)
@@ -98,4 +99,3 @@ release: make-stage
 	(cd "$(STAGEDIR)" && zip -r "../$(DISTFILEDIR)" "$(PLUGINDIR)")
 	-rm "$(LATESTLINK)" >/dev/null 2>&1
 	ln -s "$(DISTFILE)" "$(LATESTLINK)"
-	cp $(DISTFILEDIR) $(SVNDISTFILE)
