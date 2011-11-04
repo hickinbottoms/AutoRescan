@@ -1,5 +1,5 @@
-# AutoRescan Plugin for SqueezeCentre
-# Copyright © Stuart Hickinbottom 2007-2009
+# AutoRescan Plugin for Squeezebox Server
+# Copyright © Stuart Hickinbottom 2007-2011
 
 # This file is part of AutoRescan.
 #
@@ -85,7 +85,7 @@ my $serverPrefs = preferences('server');
 # Flag to protect against multiple initialisation or shutdown
 my $initialised = 0;
 
-# Below are functions that are part of the standard SqueezeCentre plugin
+# Below are functions that are part of the standard Squeezebox Server plugin
 # interface.
 
 # Return the name of this plugin; this goes on the server setting plugin
@@ -141,7 +141,7 @@ sub initPlugin() {
 	$log->debug("Initialisation complete");
 }
 
-# Called when the plugin is being disabled or SqueezeCenter shut down.
+# Called when the plugin is being disabled or Squeezebox Server shut down.
 sub shutdownPlugin() {
 
 	my $class = shift;
@@ -187,7 +187,7 @@ sub checkDefaults {
 
 # Add a watch to the music folder.
 sub addWatch() {
-	my $audioDir = $serverPrefs->get('audiodir');
+	my $audioDir = Slim::Utils::Misc::getAudioDir();
 
 	if ( defined $audioDir && -d $audioDir ) {
 		$log->debug("Adding monitor to music directory: $audioDir");
