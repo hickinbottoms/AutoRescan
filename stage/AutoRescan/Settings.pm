@@ -1,5 +1,5 @@
-# Web settings page handler for AutoRescan plugin for SqueezeCentre.
-# Copyright © Stuart Hickinbottom 2007-2009
+# Web settings page handler for AutoRescan plugin for Squeezebox Server.
+# Copyright © Stuart Hickinbottom 2007-2011
 
 # This file is part of AutoRescan
 #

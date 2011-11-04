@@ -1,5 +1,5 @@
-# Makefile for AutoRescan plugin for SqueezeCentre 7.0 (and later)
-# Copyright © Stuart Hickinbottom 2007-2009
+# Makefile for AutoRescan plugin for Squeezebox Server 7.7 (and later)
+# Copyright © Stuart Hickinbottom 2007-2011
 
 # This file is part of AutoRescan.
 #
@@ -86,7 +86,7 @@ restart:
 	sudo /etc/init.d/squeezeslave restart
 
 logtail:
-	echo "Following the end of the SqueezeCentre log..."
+	echo "Following the end of the Squeezebox Server log..."
 	multitail -f /var/log/squeezeboxserver-7.7/server.log
 
 # Build a distribution package for this Plugin.

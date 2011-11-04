@@ -1,5 +1,5 @@
-# Linux directory monitoring for AutoRescan plugin for SqueezeCentre.
-# Copyright © Stuart Hickinbottom 2007-2009
+# Linux directory monitoring for AutoRescan plugin for Squeezebox Server.
+# Copyright © Stuart Hickinbottom 2007-2011
 
 # This file is part of AutoRescan
 #
@@ -69,7 +69,7 @@ sub new {
 	}
 
 	# We don't operate in blocking mode - we're going to poll for changes
-	# to make sure SqueezeCenter keeps running.
+	# to make sure Squeezebox Server keeps running.
 	$inotify->blocking(0);
 
 	return $self;
