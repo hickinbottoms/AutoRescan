@@ -187,7 +187,7 @@ sub checkDefaults {
 
 # Add a watch to the music folder.
 sub addWatch() {
-	my $audioDir = $serverPrefs->get('audiodir');
+	my $audioDir = Slim::Utils::Misc::getAudioDir();
 
 	if ( defined $audioDir && -d $audioDir ) {
 		$log->debug("Adding monitor to music directory: $audioDir");
