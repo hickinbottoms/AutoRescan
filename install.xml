@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!-- Metadata file for AutoRescan plugin -->
-<!-- Copyright © Stuart Hickinbottom 2007-2009 -->
+<!-- Copyright © Stuart Hickinbottom 2007-2011 -->
 
 <!-- This file is part of AutoRescan -->
 
@@ -20,8 +20,6 @@
 <!-- Foundation, Inc., 51 Franklin St, Fifth Floor, -->
 <!-- Boston, MA  02110-1301  USA -->
 
-<!-- $Id$ -->
-
 <extension>
 	<id>ef4fd3fe-0597-423e-99fe-262c3262ea80</id>
 	<name>PLUGIN_AUTORESCAN</name>
@@ -38,9 +36,9 @@
 	<type>2</type>
 
 	<targetApplication>
-		<id>SqueezeCentre</id>
-		<minVersion>7.2</minVersion>
-		<maxVersion>7.5+</maxVersion>
+		<id>Squeezebox Server</id>
+		<minVersion>7.7</minVersion>
+		<maxVersion>7.7+</maxVersion>
 	</targetApplication>
 
 	<targetPlatform>Linux</targetPlatform>

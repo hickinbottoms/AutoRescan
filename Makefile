@@ -1,5 +1,5 @@
-# Makefile for AutoRescan plugin for SqueezeCentre 7.0 (and later)
-# Copyright © Stuart Hickinbottom 2007-2009
+# Makefile for AutoRescan plugin for Squeezebox Server 7.7 (and later)
+# Copyright © Stuart Hickinbottom 2007-2011
 
 # This file is part of AutoRescan.
 #
@@ -17,15 +17,13 @@
 # along with AutoRescan; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id$
-
-VERSION=1.1
+VERSION=1.2
 PERLSOURCE=Plugin.pm Settings.pm Monitor_Linux.pm Monitor_Windows.pm
 HTMLSOURCE=HTML/EN/plugins/AutoRescan/settings/basic.html
 SOURCE=$(PERLSOURCE) $(HTMLSOURCE) INSTALL strings.txt install.xml LICENSE
 RELEASEDIR=releases
 STAGEDIR=stage
-SLIMDIR=/usr/local/squeezecenter/server
+SLIMDIR=/usr/local/squeezeboxserver-7.7/server
 PLUGINSDIR=$(SLIMDIR)/Plugins
 PLUGINDIR=AutoRescan
 COMMIT=`git log -1 --pretty=format:%H`
@@ -33,7 +31,6 @@ DISTFILE=AutoRescan-$(VERSION).zip
 DISTFILEDIR=$(RELEASEDIR)/$(DISTFILE)
 SVNDISTFILE=AutoRescan.zip
 LATESTLINK=$(RELEASEDIR)/AutoRescan-latest.zip
-PREFS=/etc/squeezecenter.pref
 
 .SILENT:
 
@@ -65,31 +62,30 @@ pretty:
 	done
 	echo "You're Beautiful..."
 
-# Install the plugin in SqueezeCentre.
+# Install the plugin in SBS
 install: make-stage
 	echo Installing plugin...
 	-[[ -d "$(PLUGINSDIR)/$(PLUGINDIR)" ]] && sudo chmod -R +w "$(PLUGINSDIR)/$(PLUGINDIR)"
 	-[[ -d "$(PLUGINSDIR)/$(PLUGINDIR)" ]] && sudo rm -r "$(PLUGINSDIR)/$(PLUGINDIR)"
 	sudo cp -r "$(STAGEDIR)/$(PLUGINDIR)" "$(PLUGINSDIR)"
 
-# Restart SqueezeCentre, quite forcefully. This is obviously quite
-# Gentoo-specific.
+# Restart SBS, quite forcefully. This is obviously quite Gentoo-specific.
 restart:
-	echo "Forcefully restarting SqueezeCentre..."
+	echo "Forcefully restarting SBS..."
 	-sudo pkill -9 squeezeslave
 	sudo /etc/init.d/squeezeslave zap
-	sudo /etc/init.d/squeezecenter stop
-	sudo /etc/init.d/squeezecenter zap
+	sudo /etc/init.d/squeezeboxserver-7.7 stop
+	sudo /etc/init.d/squeezeboxserver-7.7 zap
 	sleep 2
-	sudo sh -c ">/var/log/squeezecenter/server.log"
-	sudo sh -c ">/var/log/squeezecenter/scanner.log"
-	sudo sh -c ">/var/log/squeezecenter/perfmon.log"
-	sudo /etc/init.d/squeezecenter restart
+	sudo sh -c ">/var/log/squeezeboxserver-7.7/server.log"
+	sudo sh -c ">/var/log/squeezeboxserver-7.7/scanner.log"
+	sudo sh -c ">/var/log/squeezeboxserver-7.7/perfmon.log"
+	sudo /etc/init.d/squeezeboxserver-7.7 restart
 	sudo /etc/init.d/squeezeslave restart
 
 logtail:
-	echo "Following the end of the SqueezeCentre log..."
-	multitail -f /var/log/squeezecenter/server.log
+	echo "Following the end of the Squeezebox Server log..."
+	multitail -f /var/log/squeezeboxserver-7.7/server.log
 
 # Build a distribution package for this Plugin.
 release: make-stage
