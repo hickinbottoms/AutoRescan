@@ -17,8 +17,6 @@
 # along with AutoRescan; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id$
-
 # This is a plugin to provide automatic rescanning of music files as they are
 # changed within the filesystem. It depends on the 'inotify' kernel function
 # within Linux and, therefore, currently only works when used on a Linux system
