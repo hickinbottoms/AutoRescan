@@ -17,8 +17,6 @@
 # along with AutoRescan; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id$
-
 # This is a plugin to provide automatic rescanning of music files as they are
 # changed within the filesystem. It depends on the 'inotify' kernel function
 # within Linux and, therefore, currently only works when used on a Linux system
@@ -60,7 +58,7 @@ use constant AUTORESCAN_POLL => 1;
 
 # Export the version to the server (as a subversion keyword).
 use vars qw($VERSION);
-$VERSION = 'v1.1 (trunk-7.x)';
+$VERSION = 'v1.2 (trunk-7.x)';
 
 # A logger we will use to write plugin-specific messages.
 my $log = Slim::Utils::Log->addLogCategory(

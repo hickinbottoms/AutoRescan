@@ -20,13 +20,11 @@
 <!-- Foundation, Inc., 51 Franklin St, Fifth Floor, -->
 <!-- Boston, MA  02110-1301  USA -->
 
-<!-- $Id$ -->
-
 <extension>
 	<id>ef4fd3fe-0597-423e-99fe-262c3262ea80</id>
 	<name>PLUGIN_AUTORESCAN</name>
 	<module>Plugins::AutoRescan::Plugin</module>
-	<version>1.1</version>
+	<version>1.2</version>
 	<description>PLUGIN_AUTORESCAN_DESC</description>
 	<creator>Stuart Hickinbottom</creator>
 	<email>stuart@hickinbottom.com</email>
