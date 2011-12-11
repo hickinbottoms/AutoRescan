@@ -185,24 +185,30 @@ sub checkDefaults {
 
 # Add a watch to the music folder.
 sub addWatch() {
-	my $audioDir = Slim::Utils::Misc::getAudioDir();
+	# Filter media directories for those with audio - LMS7.7+ only.
+	my $audioDirs = Slim::Utils::Misc::getMediaDirs('audio');
 
-	if ( defined $audioDir && -d $audioDir ) {
-		$log->debug("Adding monitor to music directory: $audioDir");
+	for my $audioDir (@$audioDirs) {
+$log->debug("directory: " . $audioDir);
 
-		# Add the watch callback. This will also watch all subordinate folders.
-		addNotifierRecursive($audioDir);
+		if ( defined $audioDir && -d $audioDir ) {
+			$log->debug("Adding monitor to music directory: $audioDir");
 
-		# Tell the monitor.
-		$monitor->addDone if $monitor;
+			# Add the watch callback. This will also watch all subordinate folders.
+			addNotifierRecursive($audioDir);
 
-		# Add a poller callback timer. We need this to pump events.
-		Slim::Utils::Timers::setTimer( undef,
-			Time::HiRes::time() + AUTORESCAN_POLL, \&poller );
+			# Tell the monitor.
+			$monitor->addDone if $monitor;
 
-	} else {
-		$log->info(
-			"Music folder is not defined - skipping add of change monitor");
+			# Add a poller callback timer. We need this to pump events.
+			Slim::Utils::Timers::setTimer( undef,
+				Time::HiRes::time() + AUTORESCAN_POLL, \&poller );
+
+		} else {
+			$log->info(
+				"Music folder is not defined - skipping add of change monitor");
+		}
+
 	}
 
 }
