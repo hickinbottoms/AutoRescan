@@ -45,7 +45,7 @@ sub new {
 	my $invocant = shift;
 	my $class    = ref($invocant) || $invocant;
 	my $self     = {
-		poll_each => 1,
+		poll_each  => 1,
 		can_script => 0,
 	};
 	bless( $self, $class );
@@ -100,7 +100,7 @@ sub poll {
 
 # Nothing to do for this plugin (scripts not yet supported).
 sub executeScript {
-	my $class = shift;
+	my $class  = shift;
 	my $script = shift;
 }
 
