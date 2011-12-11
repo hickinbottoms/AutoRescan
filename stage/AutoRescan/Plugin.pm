@@ -50,7 +50,7 @@ use Slim::Utils::OSDetect;
 use constant PLUGIN_NAME => 'PLUGIN_AUTORESCAN';
 
 # Preference ranges and defaults.
-use constant AUTORESCAN_DELAY_DEFAULT => 5;
+use constant AUTORESCAN_DELAY_DEFAULT  => 5;
 use constant AUTORESCAN_SCRIPT_DEFAULT => '';
 
 # Polling control.
@@ -58,7 +58,7 @@ use constant AUTORESCAN_POLL => 1;
 
 # Export the version to the server (as a subversion keyword).
 use vars qw($VERSION);
-$VERSION = 'v1.2 (trunk-7.x)';
+$VERSION = 'v1.3 (trunk-7.x)';
 
 # A logger we will use to write plugin-specific messages.
 my $log = Slim::Utils::Log->addLogCategory(
@@ -123,7 +123,7 @@ sub initPlugin() {
 	$can_script = $monitor->{can_script} if ($monitor);
 
 	# Initialise settings.
-	Plugins::AutoRescan::Settings->new($class, $can_script);
+	Plugins::AutoRescan::Settings->new( $class, $can_script );
 
 	# Remember we're now initialised. This prevents multiple-initialisation,
 	# which may otherwise cause trouble with duplicate hooks or modes.
@@ -185,16 +185,16 @@ sub checkDefaults {
 
 # Add a watch to the music folder.
 sub addWatch() {
+
 	# Filter media directories for those with audio - LMS7.7+ only.
 	my $audioDirs = Slim::Utils::Misc::getMediaDirs('audio');
 
 	for my $audioDir (@$audioDirs) {
-$log->debug("directory: " . $audioDir);
 
 		if ( defined $audioDir && -d $audioDir ) {
 			$log->debug("Adding monitor to music directory: $audioDir");
 
-			# Add the watch callback. This will also watch all subordinate folders.
+		 # Add the watch callback. This will also watch all subordinate folders.
 			addNotifierRecursive($audioDir);
 
 			# Tell the monitor.
@@ -319,8 +319,8 @@ sub delayedChangeCallback {
 		Slim::Control::Request::executeRequest( undef, ['rescan'] );
 
 		# If the monitor supports a rescan script then call it.
-		if ($monitor->{can_script}) {
-			$monitor->executeScript($myPrefs->get('script'));
+		if ( $monitor->{can_script} ) {
+			$monitor->executeScript( $myPrefs->get('script') );
 		}
 	}
 }
