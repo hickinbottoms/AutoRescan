@@ -50,7 +50,7 @@ use Slim::Utils::OSDetect;
 use constant PLUGIN_NAME => 'PLUGIN_AUTORESCAN';
 
 # Preference ranges and defaults.
-use constant AUTORESCAN_DELAY_DEFAULT => 5;
+use constant AUTORESCAN_DELAY_DEFAULT  => 5;
 use constant AUTORESCAN_SCRIPT_DEFAULT => '';
 
 # Polling control.
@@ -123,7 +123,7 @@ sub initPlugin() {
 	$can_script = $monitor->{can_script} if ($monitor);
 
 	# Initialise settings.
-	Plugins::AutoRescan::Settings->new($class, $can_script);
+	Plugins::AutoRescan::Settings->new( $class, $can_script );
 
 	# Remember we're now initialised. This prevents multiple-initialisation,
 	# which may otherwise cause trouble with duplicate hooks or modes.
@@ -185,24 +185,30 @@ sub checkDefaults {
 
 # Add a watch to the music folder.
 sub addWatch() {
-	my $audioDir = Slim::Utils::Misc::getAudioDir();
 
-	if ( defined $audioDir && -d $audioDir ) {
-		$log->debug("Adding monitor to music directory: $audioDir");
+	# Filter media directories for those with audio - LMS7.7+ only.
+	my $audioDirs = Slim::Utils::Misc::getMediaDirs('audio');
 
-		# Add the watch callback. This will also watch all subordinate folders.
-		addNotifierRecursive($audioDir);
+	for my $audioDir (@$audioDirs) {
 
-		# Tell the monitor.
-		$monitor->addDone if $monitor;
+		if ( defined $audioDir && -d $audioDir ) {
+			$log->debug("Adding monitor to music directory: $audioDir");
 
-		# Add a poller callback timer. We need this to pump events.
-		Slim::Utils::Timers::setTimer( undef,
-			Time::HiRes::time() + AUTORESCAN_POLL, \&poller );
+		 # Add the watch callback. This will also watch all subordinate folders.
+			addNotifierRecursive($audioDir);
 
-	} else {
-		$log->info(
-			"Music folder is not defined - skipping add of change monitor");
+			# Tell the monitor.
+			$monitor->addDone if $monitor;
+
+			# Add a poller callback timer. We need this to pump events.
+			Slim::Utils::Timers::setTimer( undef,
+				Time::HiRes::time() + AUTORESCAN_POLL, \&poller );
+
+		} else {
+			$log->info(
+				"Music folder is not defined - skipping add of change monitor");
+		}
+
 	}
 
 }
@@ -313,8 +319,8 @@ sub delayedChangeCallback {
 		Slim::Control::Request::executeRequest( undef, ['rescan'] );
 
 		# If the monitor supports a rescan script then call it.
-		if ($monitor->{can_script}) {
-			$monitor->executeScript($myPrefs->get('script'));
+		if ( $monitor->{can_script} ) {
+			$monitor->executeScript( $myPrefs->get('script') );
 		}
 	}
 }

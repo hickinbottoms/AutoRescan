@@ -49,7 +49,7 @@ sub new {
 	my $invocant = shift;
 	my $class    = ref($invocant) || $invocant;
 	my $self     = {
-		poll_each => 0,
+		poll_each  => 0,
 		can_script => 1,
 	};
 	bless( $self, $class );
@@ -169,7 +169,7 @@ sub watchCallback() {
 
 # Execute the named script (if it exists).
 sub executeScript {
-	my $class = shift;
+	my $class  = shift;
 	my $script = shift;
 
 	if ($script) {
