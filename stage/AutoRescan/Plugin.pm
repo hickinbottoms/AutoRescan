@@ -58,7 +58,7 @@ use constant AUTORESCAN_POLL => 1;
 
 # Export the version to the server (as a subversion keyword).
 use vars qw($VERSION);
-$VERSION = 'v1.3 (trunk-7.x)';
+$VERSION = 'v1.3.1 (trunk-7.x)';
 
 # A logger we will use to write plugin-specific messages.
 my $log = Slim::Utils::Log->addLogCategory(

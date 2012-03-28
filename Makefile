@@ -17,13 +17,14 @@
 # along with AutoRescan; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-VERSION=1.3
+VERSION=1.3.1
 PERLSOURCE=Plugin.pm Settings.pm Monitor_Linux.pm Monitor_Windows.pm
 HTMLSOURCE=HTML/EN/plugins/AutoRescan/settings/basic.html
 SOURCE=$(PERLSOURCE) $(HTMLSOURCE) INSTALL strings.txt install.xml LICENSE
 RELEASEDIR=releases
 STAGEDIR=stage
-SLIMDIR=/usr/local/squeezeboxserver-7.7/server
+SLIMVER=7.8
+SLIMDIR=/usr/local/squeezeboxserver-$(SLIMVER)/server
 PLUGINSDIR=$(SLIMDIR)/Plugins
 PLUGINDIR=AutoRescan
 COMMIT=`git log -1 --pretty=format:%H`
@@ -74,18 +75,18 @@ restart:
 	echo "Forcefully restarting SBS..."
 	-sudo pkill -9 squeezeslave
 	sudo /etc/init.d/squeezeslave zap
-	sudo /etc/init.d/squeezeboxserver-7.7 stop
-	sudo /etc/init.d/squeezeboxserver-7.7 zap
+	sudo /etc/init.d/squeezeboxserver-$(SLIMVER) stop
+	sudo /etc/init.d/squeezeboxserver-$(SLIMVER) zap
 	sleep 2
-	sudo sh -c ">/var/log/squeezeboxserver-7.7/server.log"
-	sudo sh -c ">/var/log/squeezeboxserver-7.7/scanner.log"
-	sudo sh -c ">/var/log/squeezeboxserver-7.7/perfmon.log"
-	sudo /etc/init.d/squeezeboxserver-7.7 restart
+	sudo sh -c ">/var/log/squeezeboxserver-$(SLIMVER)/server.log"
+	sudo sh -c ">/var/log/squeezeboxserver-$(SLIMVER)/scanner.log"
+	sudo sh -c ">/var/log/squeezeboxserver-$(SLIMVER)/perfmon.log"
+	sudo /etc/init.d/squeezeboxserver-$(SLIMVER) restart
 	sudo /etc/init.d/squeezeslave restart
 
 logtail:
 	echo "Following the end of the Squeezebox Server log..."
-	multitail -f /var/log/squeezeboxserver-7.7/server.log
+	multitail -f /var/log/squeezeboxserver-$(SLIMVER)/server.log
 
 # Build a distribution package for this Plugin.
 release: make-stage

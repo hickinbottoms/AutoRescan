@@ -24,7 +24,7 @@
 	<id>ef4fd3fe-0597-423e-99fe-262c3262ea80</id>
 	<name>PLUGIN_AUTORESCAN</name>
 	<module>Plugins::AutoRescan::Plugin</module>
-	<version>1.3</version>
+	<version>1.3.1</version>
 	<description>PLUGIN_AUTORESCAN_DESC</description>
 	<creator>Stuart Hickinbottom</creator>
 	<email>stuart@hickinbottom.com</email>
@@ -38,7 +38,7 @@
 	<targetApplication>
 		<id>Squeezebox Server</id>
 		<minVersion>7.7</minVersion>
-		<maxVersion>7.7+</maxVersion>
+		<maxVersion>7.8+</maxVersion>
 	</targetApplication>
 
 	<targetPlatform>Linux</targetPlatform>
