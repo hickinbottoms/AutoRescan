@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!-- Metadata file for AutoRescan plugin -->
-<!-- Copyright © Stuart Hickinbottom 2007-2011 -->
+<!-- Copyright © Stuart Hickinbottom 2007-2013 -->
 
 <!-- This file is part of AutoRescan -->
 
@@ -30,7 +30,7 @@
 	<email>stuart@hickinbottom.com</email>
 
 	<defaultState>enabled</defaultState>
-        
+
 	<homepageURL>http://www.hickinbottom.com/autorescan</homepageURL>
 	<optionsURL>plugins/AutoRescan/settings/basic.html</optionsURL>
 	<type>2</type>
