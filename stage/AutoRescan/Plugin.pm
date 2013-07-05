@@ -1,5 +1,5 @@
 # AutoRescan Plugin for Squeezebox Server
-# Copyright © Stuart Hickinbottom 2007-2011
+# Copyright © Stuart Hickinbottom 2007-2013
 
 # This file is part of AutoRescan.
 #
@@ -58,7 +58,7 @@ use constant AUTORESCAN_POLL => 1;
 
 # Export the version to the server (as a subversion keyword).
 use vars qw($VERSION);
-$VERSION = 'v1.3.1 (trunk-7.x)';
+$VERSION = 'v1.4 (trunk-7.x)';
 
 # A logger we will use to write plugin-specific messages.
 my $log = Slim::Utils::Log->addLogCategory(
@@ -235,9 +235,17 @@ sub addNotifierRecursive($) {
 sub addNotifier($) {
 	my $dir = shift;
 
+	# We prune the search from directories that start with a '.'
+	# (don't you also keep your music files in git-annex..?)
+	if (basename($dir) =~ m/^\./) {
+		$File::Find::prune = 1;
+		$log->debug("Not monitoring hidden directory tree: $dir");
+		return;
+	}
+
 	# Only add a monitor if we're not already monitoring this directory (and
 	# it is indeed a directory).
-	if ( not exists $monitors{$dir} && -d $dir ) {
+	if (not exists $monitors{$dir}) {
 
 		# Remember the monitor object created - we do this so we can check if
 		# it's already being monitored later on.
