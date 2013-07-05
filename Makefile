@@ -17,7 +17,7 @@
 # along with AutoRescan; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-VERSION=1.3.1
+VERSION=1.4
 PERLSOURCE=Plugin.pm Settings.pm Monitor_Linux.pm Monitor_Windows.pm
 HTMLSOURCE=HTML/EN/plugins/AutoRescan/settings/basic.html
 SOURCE=$(PERLSOURCE) $(HTMLSOURCE) README strings.txt install.xml LICENSE
