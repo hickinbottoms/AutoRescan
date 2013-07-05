@@ -20,11 +20,11 @@
 VERSION=1.3.1
 PERLSOURCE=Plugin.pm Settings.pm Monitor_Linux.pm Monitor_Windows.pm
 HTMLSOURCE=HTML/EN/plugins/AutoRescan/settings/basic.html
-SOURCE=$(PERLSOURCE) $(HTMLSOURCE) INSTALL strings.txt install.xml LICENSE
+SOURCE=$(PERLSOURCE) $(HTMLSOURCE) README strings.txt install.xml LICENSE
 RELEASEDIR=releases
 STAGEDIR=stage
 SLIMVER=7.8
-SLIMDIR=/usr/local/squeezeboxserver-$(SLIMVER)/server
+SLIMDIR=/usr/local/slimserver
 PLUGINSDIR=$(SLIMDIR)/Plugins
 PLUGINDIR=AutoRescan
 COMMIT=`git log -1 --pretty=format:%H`
@@ -73,7 +73,7 @@ install: make-stage
 # Restart SBS, quite forcefully. This is obviously quite Gentoo-specific.
 restart:
 	echo "Forcefully restarting SBS..."
-	-sudo pkill -9 squeezeslave
+#	-sudo pkill -9 squeezeslave
 	sudo /etc/init.d/squeezeslave zap
 	sudo /etc/init.d/squeezeboxserver-$(SLIMVER) stop
 	sudo /etc/init.d/squeezeboxserver-$(SLIMVER) zap
@@ -82,7 +82,7 @@ restart:
 	sudo sh -c ">/var/log/squeezeboxserver-$(SLIMVER)/scanner.log"
 	sudo sh -c ">/var/log/squeezeboxserver-$(SLIMVER)/perfmon.log"
 	sudo /etc/init.d/squeezeboxserver-$(SLIMVER) restart
-	sudo /etc/init.d/squeezeslave restart
+#	sudo /etc/init.d/squeezeslave restart
 
 logtail:
 	echo "Following the end of the Squeezebox Server log..."
