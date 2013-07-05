@@ -1,5 +1,5 @@
 # Linux directory monitoring for AutoRescan plugin for Squeezebox Server.
-# Copyright © Stuart Hickinbottom 2007-2011
+# Copyright © Stuart Hickinbottom 2007-2013
 
 # This file is part of AutoRescan
 #
