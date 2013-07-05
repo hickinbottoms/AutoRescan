@@ -122,9 +122,10 @@ sub watchCallback() {
 	my $was_deleted    = $e->IN_DELETE;
 	my $was_moved_to   = $e->IN_MOVED_TO;
 	my $was_moved_from = $e->IN_MOVED_FROM;
+	my $was_attred     = $e->IN_ATTRIB;
 	my $dir_name       = dirname($filename);
 	$log->debug(
-"Received inotify event for: $filename (is_directory=$is_directory, was_created=$was_created, was_modified=$was_modified, was_deleted=$was_deleted, was_moved_from=$was_moved_from, was_moved_to=$was_moved_to"
+"Received inotify event for: $filename (is_directory=$is_directory, was_created=$was_created, was_modified=$was_modified, was_deleted=$was_deleted, was_moved_from=$was_moved_from, was_moved_to=$was_moved_to, was_attred=$was_attred"
 	);
 
 	if ( $was_created && $is_directory ) {
@@ -162,6 +163,14 @@ sub watchCallback() {
 		Plugins::AutoRescan::Plugin::noteTouch($filename);
 	} elsif ( $was_moved_from && not $is_directory ) {
 		$log->info("Directory detected as modified by move out: $dir_name");
+
+		Plugins::AutoRescan::Plugin::noteTouch($dir_name);
+	} elsif ( $was_attred && $is_directory ) {
+		$log->info("Directory detected as modified by attribute change: $filename");
+
+		Plugins::AutoRescan::Plugin::noteTouch($filename);
+	} elsif ( $was_attred && not $is_directory ) {
+		$log->info("Directory detected as modified by file attribute change: $dir_name");
 
 		Plugins::AutoRescan::Plugin::noteTouch($dir_name);
 	}
