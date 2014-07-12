@@ -1,5 +1,5 @@
 # AutoRescan Plugin for Squeezebox Server
-# Copyright © Stuart Hickinbottom 2007-2013
+# Copyright © Stuart Hickinbottom 2007-2014
 
 # This file is part of AutoRescan.
 #

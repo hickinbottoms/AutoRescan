@@ -1,5 +1,5 @@
 # Makefile for AutoRescan plugin for Squeezebox Server 7.7 (and later)
-# Copyright © Stuart Hickinbottom 2007-2013
+# Copyright © Stuart Hickinbottom 2007-2014
 
 # This file is part of AutoRescan.
 #
