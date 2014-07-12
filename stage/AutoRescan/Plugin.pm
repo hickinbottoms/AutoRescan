@@ -1,5 +1,5 @@
 # AutoRescan Plugin for Squeezebox Server
-# Copyright © Stuart Hickinbottom 2007-2013
+# Copyright © Stuart Hickinbottom 2007-2014
 
 # This file is part of AutoRescan.
 #
@@ -58,7 +58,7 @@ use constant AUTORESCAN_POLL => 1;
 
 # Export the version to the server (as a subversion keyword).
 use vars qw($VERSION);
-$VERSION = 'v1.4 (trunk-7.x)';
+$VERSION = 'v1.4.1 (trunk-7.x)';
 
 # A logger we will use to write plugin-specific messages.
 my $log = Slim::Utils::Log->addLogCategory(
