@@ -1,5 +1,5 @@
 # String file for AutoRescan plugin
-# Copyright © Stuart Hickinbottom 2007-2013
+# Copyright © Stuart Hickinbottom 2007-2014
 
 # This file is part of AutoRescan.
 #
@@ -39,7 +39,7 @@ SETUP_PLUGIN_AUTORESCAN_DELAY_CHOOSE
 	EN	Rescan delay (seconds):
 
 SETUP_PLUGIN_AUTORESCAN_SCRIPT_DESC
-	EN	This setting allows you to specify a script that will be executed at the same time that the plugin triggers a rescan of the music library. Note that this script will be executed within the main SqueezeCenter server thread and so you need to bear in mind a) that the script will run with the same privilege as SqueezeCenter (be careful) and b) if the script does not return quickly then SqueezeCenter will be hang while the script runs (and music may stutter). Leave this setting empty if you don't want to execute a script when rescanning.
+	EN	This setting allows you to specify a script that will be executed at the same time that the plugin triggers a rescan of the music library. Note that this script will be executed within the main SqueezeCenter server thread and so you need to bear in mind a) that the script will run with the same privilege as SqueezeCenter (be careful) and b) if the script does not return quickly then SqueezeCenter will hang while the script runs (and music may stutter). Leave this setting empty if you don't want to execute a script when rescanning.
 
 SETUP_PLUGIN_AUTORESCAN_SCRIPT_CHOOSE
 	EN	Script to execute when rescanning:
